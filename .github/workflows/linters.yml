@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - '**/*.py'
+      - 'poetry.lock'
+      - 'pyproject.toml'
+      - '.github/workflows/linters.yml'
+  pull_request:
+    paths:
+      - '**/*.py'
+      - 'poetry.lock'
+      - 'pyproject.toml'
+      - '.github/workflows/linters.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container: python:3.11-slim
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Poetry
+        run: |
+          apt-get update && apt-get install -y curl
+          curl -sSL https://install.python-poetry.org | POETRY_HOME=/etc/poetry python3 -
+          echo "$PATH:/etc/poetry/bin" >> $GITHUB_ENV
+          poetry config virtualenvs.in-project true
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            .venv
+            ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+          restore-keys: ${{ runner.os }}-poetry-
+
+      - name: Install dependencies
+        run: poetry install -vvv --no-root
+
+      - name: Run Mypy
+        run: poetry run mypy .
+
+      - name: Run Black
+        run: poetry run black . --check
+
+      - name: Run Ruff
+        run: poetry run ruff .
