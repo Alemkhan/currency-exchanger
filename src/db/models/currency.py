@@ -1,6 +1,7 @@
 import enum
 from decimal import Decimal
-from sqlalchemy import String, Numeric
+
+from sqlalchemy import Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db import Base

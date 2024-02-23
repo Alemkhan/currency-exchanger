@@ -1,9 +1,8 @@
 from typing import Sequence
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from db.models import Currency
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CurrencyRepository:
@@ -17,6 +16,10 @@ class CurrencyRepository:
         stmt = select(Currency).where(Currency.code == currency_code)
         return (await self._session.execute(stmt)).scalar_one()
 
-    async def bulk_create(self, currencies: list[Currency]):
-        await self._session.run_sync(lambda session: session.bulk_insert_mappings(Currency, currencies))
-        await self._session.commit()
+    async def bulk_create(self, currencies: list[Currency]) -> None:
+        await self._session.run_sync(lambda session: session.bulk_save_objects(currencies))
+
+    async def bulk_update(self, currencies: list[Currency]) -> None:
+        await self._session.execute(
+            update(Currency), [{"code": currency.code, "rate": currency.rate} for currency in currencies]
+        )

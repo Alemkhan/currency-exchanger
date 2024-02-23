@@ -1,7 +1,9 @@
 import traceback
 from typing import Any
 
+from api.router import api_router
 from asyncpg.exceptions._base import PostgresError
+from core.exceptions import ExchangeServiceException, handle_exchange_service_error
 from db.session import engine
 from fastapi import FastAPI
 from fastapi.exception_handlers import http_exception_handler
@@ -48,6 +50,9 @@ def create_app() -> FastAPI:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         return JSONResponse({"status": "ok"}, status_code=status.HTTP_200_OK)
+
+    app.include_router(api_router, prefix="/api")
+    app.add_exception_handler(ExchangeServiceException, handle_exchange_service_error)  # type: ignore
 
     @app.exception_handler(HTTPException)
     async def custom_http_exception_handler(request: Request, exc: HTTPException) -> Response:

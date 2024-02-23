@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  backend:
+    build: .
+    depends_on: [database, backend-migration]
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+
+  backend-migration:
+    build: .
+    restart: "no"
+    depends_on:
+      database:
+        condition: service_healthy
+    entrypoint: "alembic upgrade head"
+    env_file:
+      - .env
+
+  database:
+    image: postgres:15-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=${database_password}
+      - POSTGRES_DB=${database_name}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  scheduler:
+      build: .
+      depends_on: [ database, backend-migration ]
+      entrypoint: [python, src/scheduler.py]
+      env_file:
+        - .env
+
+volumes:
+  postgres-data:

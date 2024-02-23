@@ -22,7 +22,7 @@ class RunType(enum.Enum):
             raise ValueError()
 
 
-if __name__ == "__main__":
+def main() -> None:
     dotenv.load_dotenv()
 
     parser = argparse.ArgumentParser()
@@ -38,3 +38,10 @@ if __name__ == "__main__":
             asyncio.run(scheduler.main())
         case RunType.shell:
             pass
+
+
+if __name__ == "__main__":
+    dotenv.load_dotenv()
+    uvicorn.run("app:create_app", factory=True, reload=True)
+
+    main()

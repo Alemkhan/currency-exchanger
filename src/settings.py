@@ -50,10 +50,6 @@ class DatabaseSettings(BaseSettings):
     def url(self) -> str:
         return self._dsn.url.unicode_string()
 
-    @property
-    def sync_url(self) -> str:
-        return self._dsn.url.unicode_string().replace("+asyncpg", "")
-
 
 class RatesAPIProviderSettings(BaseSettings):
     class Config:
@@ -61,7 +57,7 @@ class RatesAPIProviderSettings(BaseSettings):
 
     api_provider_name: str = "exchangeratesapi"
     base_url: str = "http://api.exchangeratesapi.io"
-    api_url: str = "/v1/latest?access_key={1}"
+    api_url: str = "/v1/latest?access_key={}"
     access_key: str = "token"
 
     @property
