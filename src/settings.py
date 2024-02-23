@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib.parse import urljoin
 
 from pydantic import BaseModel, PostgresDsn, model_validator
 from pydantic_settings import BaseSettings
@@ -49,6 +50,25 @@ class DatabaseSettings(BaseSettings):
     def url(self) -> str:
         return self._dsn.url.unicode_string()
 
+    @property
+    def sync_url(self) -> str:
+        return self._dsn.url.unicode_string().replace("+asyncpg", "")
+
+
+class RatesAPIProviderSettings(BaseSettings):
+    class Config:
+        env_prefix = "rates_"
+
+    api_provider_name: str = "exchangeratesapi"
+    base_url: str = "http://api.exchangeratesapi.io"
+    api_url: str = "/v1/latest?access_key={1}"
+    access_key: str = "token"
+
+    @property
+    def api_request_url(self) -> str:
+        return urljoin(self.base_url, self.api_url.format(self.access_key))
+
 
 app_settings = AppSettings()
 database_settings = DatabaseSettings()
+rates_settings = RatesAPIProviderSettings()

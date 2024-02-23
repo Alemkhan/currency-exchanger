@@ -356,6 +356,17 @@ files = [
 ]
 
 [[package]]
+name = "iso4217"
+version = "1.11.20220401"
+description = "ISO 4217 currency data package for Python"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+files = [
+    {file = "iso4217-1.11.20220401-py2.py3-none-any.whl", hash = "sha256:28f9c47cc6961c85b87599af7d61df90f707efd936babeb88094c2e1d8d67e82"},
+    {file = "iso4217-1.11.20220401.tar.gz", hash = "sha256:03b5c1493f47c3fb4fb066135d66115340ddab55633b85d0ed39acacab3a090e"},
+]
+
+[[package]]
 name = "mako"
 version = "1.3.2"
 description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
@@ -853,4 +864,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "5087ce9fbaa291ed97342c88fe6851aac12f291e472b43f06d0a699b8d1d373d"
+content-hash = "9bb1a2743a62ed3f9c3896bc192f4496fcdedba772c70f61ac1d3d1eaf0889f3"

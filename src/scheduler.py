@@ -1,8 +1,13 @@
 import asyncio
 
+import httpx
+
 
 async def main() -> None:
-    pass
+    while True:
+        async with httpx.AsyncClient() as client:
+            pass
+        pass
 
 
 if __name__ == "__main__":
