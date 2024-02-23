@@ -17,28 +17,44 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.11-slim
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: |
-          apt-get update && apt-get install -y curl
-          curl -sSL https://install.python-poetry.org | POETRY_HOME=/etc/poetry python3 -
-          echo "$PATH:/etc/poetry/bin" >> $GITHUB_ENV
-          poetry config virtualenvs.in-project true
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: false
+          virtualenvs-path: ~/my-custom-path
+          installer-parallel: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+            path: .venv
+            key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
 
       - name: Cache Python dependencies
         uses: actions/cache@v2
         with:
-          path: |
-            .venv
-            ~/.cache/pypoetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-          restore-keys: ${{ runner.os }}-poetry-
+          path: .venv
+          key: pydeps-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install dependencies
-        run: poetry install -vvv --no-root
+      - name: Install project
+        run: poetry install --no-interaction
 
       - name: Run Mypy
         run: poetry run mypy .
