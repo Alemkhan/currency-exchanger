@@ -2,7 +2,7 @@ import typing
 
 import httpx
 from db.dependencies import get_session
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import ORJSONResponse
 from services.currency import CurrencyService
 from services.rate_provider import get_rate_provider
@@ -50,11 +50,11 @@ async def convert_money(
 @rates_router.post("/update")
 async def update_rates_manually(
     session: AsyncSession = Depends(get_session),
-) -> ORJSONResponse:
+) -> Response:
     async with httpx.AsyncClient() as client:
         data = await client.get(url=rates_settings.api_request_url)
         json_data = data.json()
         rate_provider = get_rate_provider()
         await rate_provider().update_rates(session, json_data)
 
-    return ORJSONResponse(content={}, status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
